@@ -1,0 +1,220 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "API Lentes - OpenAPI",
+    "version": "1.0.0",
+    "description": "Spec generada a partir de `contrato.json` - usuarios, productos, carrito y órdenes."
+  },
+  "servers": [
+    {
+      "url": "https://api.example.com",
+      "description": "API production"
+    }
+  ],
+  "paths": {
+    "/auth/register": {
+      "post": {
+        "summary": "Registrar usuario",
+        "tags": ["Auth"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {"$ref": "#/components/schemas/UserRegister"}
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Usuario registrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {"type": "string"},
+                    "user": {"$ref": "#/components/schemas/User"}
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "summary": "Login - devuelve JWT",
+        "tags": ["Auth"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {"$ref": "#/components/schemas/UserLogin"}
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Inicio de sesión exitoso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {"type": "string"},
+                    "token": {"type": "string"},
+                    "user": {"$ref": "#/components/schemas/UserShort"}
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/profile": {
+      "get": {
+        "summary": "Obtener perfil",
+        "tags": ["Users"],
+        "security": [{"bearerAuth": []}],
+        "responses": {
+          "200": {
+            "description": "Perfil del usuario",
+            "content": {"application/json": {"schema": {"$ref": "#/components/schemas/User"}}}
+          }
+        }
+      },
+      "put": {
+        "summary": "Actualizar perfil",
+        "tags": ["Users"],
+        "security": [{"bearerAuth": []}],
+        "requestBody": {"required": true, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/UserUpdate"}}}},
+        "responses": {"200": {"description": "Perfil actualizado", "content": {"application/json": {"schema": {"type": "object","properties": {"message": {"type": "string"}, "user": {"$ref": "#/components/schemas/User"}}}}}}}
+    },
+    "/products": {
+      "get": {
+        "summary": "Listar productos",
+        "tags": ["Products"],
+        "responses": {
+          "200": {
+            "description": "Lista de productos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "products": {"type": "array", "items": {"$ref": "#/components/schemas/Product"}},
+                    "total": {"type": "integer"},
+                    "page": {"type": "integer"},
+                    "limit": {"type": "integer"}
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/products/{id}": {
+      "get": {
+        "summary": "Obtener producto por ID",
+        "tags": ["Products"],
+        "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}],
+        "responses": {"200": {"description": "Producto","content": {"application/json": {"schema": {"$ref": "#/components/schemas/ProductDetail"}}}}}
+      }
+    },
+    "/categories": {
+      "get": {
+        "summary": "Listar categorías",
+        "tags": ["Categories"],
+        "responses": {"200": {"description": "Categories","content": {"application/json": {"schema": {"type": "object","properties": {"categories": {"type": "array","items": {"$ref": "#/components/schemas/Category"}}}}}}}
+      }
+    },
+    "/cart": {
+      "get": {
+        "summary": "Obtener carrito del usuario",
+        "tags": ["Cart"],
+        "security": [{"bearerAuth": []}],
+        "responses": {"200": {"description": "Carrito","content": {"application/json": {"schema": {"$ref": "#/components/schemas/Cart"}}}}}
+      }
+    },
+    "/cart/items": {
+      "post": {
+        "summary": "Agregar item al carrito",
+        "tags": ["Cart"],
+        "security": [{"bearerAuth": []}],
+        "requestBody": {"required": true, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/AddCartItem"}}}},
+        "responses": {"201": {"description": "Item agregado","content": {"application/json": {"schema": {"type": "object","properties": {"message": {"type": "string"}}}}}}}
+      }
+    },
+    "/cart/items/{item_id}": {
+      "put": {
+        "summary": "Actualizar cantidad de item",
+        "tags": ["Cart"],
+        "security": [{"bearerAuth": []}],
+        "parameters": [{"name": "item_id", "in": "path", "required": true, "schema": {"type": "integer"}}],
+        "requestBody": {"required": true, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/UpdateCartItem"}}}},
+        "responses": {"200": {"description": "Carrito actualizado","content": {"application/json": {"schema": {"type": "object","properties": {"message": {"type": "string"}, "cart": {"$ref": "#/components/schemas/Cart"}}}}}}}
+      ,
+      "delete": {
+        "summary": "Eliminar item del carrito",
+        "tags": ["Cart"],
+        "security": [{"bearerAuth": []}],
+        "parameters": [{"name": "item_id", "in": "path", "required": true, "schema": {"type": "integer"}}],
+        "responses": {"200": {"description": "Item eliminado","content": {"application/json": {"schema": {"type": "object","properties": {"message": {"type": "string"}, "cart": {"$ref": "#/components/schemas/Cart"}}}}}}}
+    },
+    "/orders": {
+      "post": {
+        "summary": "Crear orden",
+        "tags": ["Orders"],
+        "security": [{"bearerAuth": []}],
+        "requestBody": {"required": true, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/OrderCreate"}}}},
+        "responses": {"201": {"description": "Orden creada","content": {"application/json": {"schema": {"type": "object","properties": {"message": {"type": "string"}, "order": {"$ref": "#/components/schemas/Order"}}}}}}}
+      ,
+      "get": {
+        "summary": "Listar órdenes del usuario",
+        "tags": ["Orders"],
+        "security": [{"bearerAuth": []}],
+        "responses": {"200": {"description": "Órdenes","content": {"application/json": {"schema": {"type": "object","properties": {"orders": {"type": "array","items": {"$ref": "#/components/schemas/Order"}}}}}}}
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {
+      "UserRegister": {
+        "type": "object",
+        "required": ["nombre_completo", "email", "contraseña"],
+        "properties": {
+          "nombre_completo": {"type": "string"},
+          "email": {"type": "string", "format": "email"},
+          "contraseña": {"type": "string", "minLength": 8},
+          "telefono": {"type": "string"},
+          "direccion": {"type": "string"}
+        }
+      },
+      "UserLogin": {"type": "object","required": ["email","contraseña"],"properties": {"email": {"type": "string"}, "contraseña": {"type": "string"}}},
+      "UserShort": {"type": "object","properties": {"id": {"type": "integer"}, "nombre_completo": {"type": "string"}, "email": {"type": "string"}}},
+      "User": {"type": "object","properties": {"id": {"type": "integer"}, "nombre_completo": {"type": "string"}, "email": {"type": "string"}, "telefono": {"type": "string"}, "direccion": {"type": "string"}, "fecha_de_creacion": {"type": "string", "format": "date-time"}}},
+      "UserUpdate": {"type": "object","properties": {"nombre_completo": {"type": "string"}, "telefono": {"type": "string"}, "direccion": {"type": "string"}}},
+      "SKU": {"type": "object","properties": {"id": {"type": "integer"}, "sku": {"type": "string"}, "variant_name": {"type": "string"}, "precio": {"type": "number", "format": "float"}, "precio_antes": {"type": "number", "format": "float"}, "stock": {"type": "integer"}, "activo": {"type": "boolean"}}},
+      "Product": {"type": "object","properties": {"id": {"type": "integer"}, "category_id": {"type": "integer"}, "nombre_producto": {"type": "string"}, "slug": {"type": "string"}, "descripcion": {"type": "string"}, "marca": {"type": "string"}, "activo": {"type": "boolean"}, "imagenes": {"type": "array","items": {"type": "string"}}, "skus": {"type": "array","items": {"$ref": "#/components/schemas/SKU"}}}},
+      "ProductDetail": {"type": "object","properties": {"category_id": {"type": "integer"}, "nombre_producto": {"type": "string"}, "descripcion": {"type": "string"}, "marca": {"type": "string"}, "imagenes": {"type": "array","items": {"type": "string"}}, "skus": {"type": "array","items": {"type": "object","properties": {"sku": {"type": "string"}, "variant_name": {"type": "string"}, "precio": {"type": "number"}, "precio_antes": {"type": "number"}, "stock": {"type": "integer"}}}}}},
+      "Category": {"type": "object","properties": {"id": {"type": "integer"}, "nombre_categoria": {"type": "string"}, "slug": {"type": "string"}}},
+      "CartItemProduct": {"type": "object","properties": {"id": {"type": "integer"}, "nombre_producto": {"type": "string"}}},
+      "CartItem": {"type": "object","properties": {"id": {"type": "integer"}, "sku_productos": {"type": "integer"}, "cantidad": {"type": "integer"}, "precio_unitario": {"type": "number"}, "producto": {"$ref": "#/components/schemas/CartItemProduct"}}},
+      "Cart": {"type": "object","properties": {"id": {"type": "integer"}, "user_id": {"type": "integer"}, "status": {"type": "string"}, "fecha": {"type": "string"}, "items": {"type": "array","items": {"$ref": "#/components/schemas/CartItem"}}, "subtotal": {"type": "number"}}},
+      "AddCartItem": {"type": "object","required": ["sku_productos","cantidad"],"properties": {"sku_productos": {"type": "integer"}, "cantidad": {"type": "integer"}}},
+      "UpdateCartItem": {"type": "object","required": ["cantidad"],"properties": {"cantidad": {"type": "integer"}}},
+      "OrderCreate": {"type": "object","required": ["moneda"],"properties": {"moneda": {"type": "string"}, "costo_envio": {"type": "number"}, "descuento": {"type": "number"}}},
+      "Order": {"type": "object","properties": {"id": {"type": "integer"}, "user_id": {"type": "integer"}, "status": {"type": "string"}, "moneda": {"type": "string"}, "subtotal": {"type": "number"}, "costo_envio": {"type": "number"}, "descuento": {"type": "number"}, "total": {"type": "number"}}}
+    }
+  }
+}

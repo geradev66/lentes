@@ -1,0 +1,253 @@
+## 1. Usuarios
+
+### POST /auth/register (Público)
+Registra un nuevo usuario.  
+
+{
+  "nombre_completo": "string",
+  "email": "string",
+  "contraseña": "string (mín 8 caract)",
+  "telefono": "string",
+  "direccion": "string"
+}
+Response:
+
+{
+  "message": "Usuario registrado exitosamente",
+  "user": {
+    "id": "integer",
+    "nombre_completo": "string",
+    "email": "string",
+    "telefono": "string",
+    "direccion": "string",
+    "fecha_de_creacion": "string"
+  }
+}
+POST /auth/login (Público)
+Inicia sesión y devuelve JWT.
+
+{
+  "email": "string",
+  "contraseña": "string"
+}
+Response:
+
+{
+  "message": "Inicio de sesión exitoso",
+  "token": "string (JWT)",
+  "user": {
+    "id": "integer",
+    "nombre_completo": "string",
+    "email": "string"
+  }
+}
+GET /users/profile (Privado)
+Obtiene el perfil del usuario autenticado.
+Response:
+
+{
+  "id": "integer",
+  "nombre_completo": "string",
+  "email": "string",
+  "telefono": "string",
+  "direccion": "string",
+  "fecha_de_creacion": "string"
+}
+PUT /users/profile (Privado)
+Actualiza el perfil del usuario autenticado.
+
+{
+  "nombre_completo": "string",
+  "telefono": "string",
+  "direccion": "string"
+}
+
+
+2. Endpoints para Productos y Categorías
+GET /products (Público)
+Response:
+
+{
+  "products": [
+    {
+      "id": "integer",
+      "category_id": "integer",
+      "nombre_producto": "string",
+      "slug": "string",
+      "descripcion": "string",
+      "marca": "string",
+      "activo": "boolean",
+      "imagenes": ["string"],
+      "skus": [
+        {
+          "id": "integer",
+          "sku": "string",
+          "variant_name": "string",
+          "precio": "float",
+          "precio_antes": "float",
+          "stock": "integer",
+          "activo": "boolean"
+        }
+      ]
+    }
+  ],
+  "total": "integer",
+  "page": "integer",
+  "limit": "integer"
+}
+GET /products/{id} (Público)
+
+Response:
+
+{
+  "category_id": "integer",
+  "nombre_producto": "string",
+  "descripcion": "string",
+  "marca": "string",
+  "imagenes": ["string"],
+  "skus": [
+    {
+      "sku": "string",
+      "variant_name": "string",
+      "precio": "float",
+      "precio_antes": "float",
+      "stock": "integer"
+    }
+  ]
+}
+GET /categories (Público)
+Response:
+
+{
+  "categories": [
+    {
+      "id": "integer",
+      "nombre_categoria": "string",
+      "slug": "string"
+    }
+  ]
+}
+3. Endpoints para Carrito y Órdenes
+GET /cart (Privado)
+Response:
+
+{
+  "id": "integer",
+  "user_id": "integer",
+  "status": "string",
+  "fecha": "string",
+  "items": [
+    {
+      "id": "integer",
+      "sku_productos": "integer",
+      "cantidad": "integer",
+      "precio_unitario": "float",
+      "producto": {
+        "id": "integer",
+        "nombre_producto": "string"
+      }
+    }
+  ],
+  "subtotal": "float"
+}
+POST /cart/items (Privado)
+
+{
+  "sku_productos": "integer",
+  "cantidad": "integer"
+}
+Response  Item agregado.
+
+PUT /cart/items/{item_id} (Privado)
+Actualiza cantidad de un item. Path: item_id.
+
+{
+  "cantidad": "integer"
+}
+Response 
+{
+  "message": "Carrito actualizado",
+  "cart": {
+    "id": "integer",
+    "user_id": "integer",
+    "status": "string",
+    "fecha": "string",
+    "items": [
+      {
+        "id": "integer",
+        "sku_productos": "integer",
+        "cantidad": "integer",
+        "precio_unitario": "float",
+        "producto": {
+          "id": "integer",
+          "nombre_producto": "string"
+        }
+      }
+    ],
+    "subtotal": "float"
+  }
+}
+DELETE /cart/items/{item_id} (Privado)
+Response:
+
+{
+  "message": "Item eliminado",
+  "cart": {
+    "id": "integer",
+    "user_id": "integer",
+    "status": "string",
+    "fecha": "string",
+    "items": [
+      {
+        "id": "integer",
+        "sku_productos": "integer",
+        "cantidad": "integer",
+        "precio_unitario": "float",
+        "producto": {
+          "id": "integer",
+          "nombre_producto": "string"
+        }
+      }
+    ],
+    "subtotal": "float"
+  }
+}
+POST /orders (Privado)
+
+{
+  "moneda": "string",
+  "costo_envio": "float",
+  "descuento": "float"
+}
+Response:
+
+{
+  "message": "Compra realizada exitosamente",
+  "order": {
+    "id": "integer",
+    "user_id": "integer",
+    "status": "string",
+    "moneda": "string",
+    "subtotal": "float",
+    "costo_envio": "float",
+    "descuento": "float",
+    "total": "float"
+  }
+}
+GET /orders (Privado)
+Response:
+
+{
+  "orders": [
+    {
+      "id": "integer",
+      "user_id": "integer",
+      "status": "string",
+      "moneda": "string",
+      "subtotal": "float",
+      "costo_envio": "float",
+      "descuento": "float",
+      "total": "float"
+    }
+  ]
+}
